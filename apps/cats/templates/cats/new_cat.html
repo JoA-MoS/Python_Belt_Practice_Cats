@@ -1,0 +1,12 @@
+{% extends 'base.html' %} 
+{% block title %} Add a cat {% endblock title %} 
+{% block content %}
+<form action="{% url 'cats:create' %}" method="POST">
+    {% csrf_token %}
+    <h2>Add a cat</h2>
+    <div>
+        {% include "cats/_cat_fields.html" with bookId=book.id %}
+    </div>
+    <button type="submit" class="btn btn-primary">Add!</button>
+</form>
+{% endblock content %}

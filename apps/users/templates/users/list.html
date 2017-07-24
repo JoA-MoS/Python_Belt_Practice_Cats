@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% block content %}
+<table class="table table-striped">
+    <thead class="thead-inverse">
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Password</th>
+            <th>Date Added</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        {% if users %} {% for user in users %}
+        <tr>
+            <td scope="row">{{user.first_name}}</td>
+            <td>{{user.last_name}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.password}}</td>
+            <td>{{user.created_at|date:"SHORT_DATETIME_FORMAT"}}</td>
+        </tr>
+        {% endfor %} {% endif %}
+    </tbody>
+</table>
+<!--<pre> {% filter force_escape %} {% debug %} {% endfilter %} </pre>-->
+{% endblock content %}

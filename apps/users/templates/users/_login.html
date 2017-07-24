@@ -1,0 +1,25 @@
+<form action="{% url 'users:do_login' %}" method="POST">
+    {% csrf_token %}
+    <h2>Login</h2>
+    {% if messages %}
+    <div class="alert alert-danger">
+        <ul class="messages">
+            {% for msg in messages %}
+            <li>{{msg.message}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    <input type="hidden" name="next_pg" value="{{ next_pg }}" />
+    <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" class="form-control" name="email" id="email" aria-describedby="email_help" placeholder="Enter your email">
+        <small id="email_help" class="form-text text-muted">Enter your email</small>
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
