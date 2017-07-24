@@ -1,12 +1,12 @@
 {% extends 'base.html' %} 
 {% block title %} Edit a cat {% endblock title %} 
 {% block content %}
-<form action="{% url 'cats:create' %}" method="POST">
+<form action="{% url 'cats:update' cat.id %}" method="POST">
     {% csrf_token %}
     <h2>Edit a cat</h2>
     <div>
-        {% include "cats/_cat_fields.html" with bookId=book.id %}
+        {% include "cats/_cat_fields.html" %}
     </div>
-    <button type="submit" class="btn btn-primary">Add!</button>
+    <button type="submit" class="btn btn-primary">Update!</button>
 </form>
 {% endblock content %}

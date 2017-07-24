@@ -3,7 +3,9 @@ from __future__ import unicode_literals
 
 from django.shortcuts import render, redirect, HttpResponse
 from django.core.urlresolvers import reverse, resolve
-from .models import Cat
+from django.contrib import messages
+from django.db.models import Count
+from models import Cat
 from ..users.models import User
 import base64
 
@@ -16,79 +18,127 @@ logging.basicConfig(level=logging.DEBUG,
 def index(request):
     logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
+    user = User.objects.logged_in(request.session)
+    if user:
+        cats = Cat.objects.all().annotate(likes_count=Count('likes')).order_by('-likes_count')
+        for c in cats:
+            print c
+        context = {'user': user,
+                   'cats': cats}
+        # logging.debug(context['cats'][1].objects.likes_count)
+        return render(request, 'cats/list_cats.html', context)
+    else:
+        # if not logged in send to login page with next page to go to after login
+        next_pg = base64.urlsafe_b64encode(request.path)
+        return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
     return HttpResponse(logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path)))
 
 
 def new(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
     user = User.objects.logged_in(request.session)
     if user:
         return render(request, 'cats/new_cat.html')
     else:
         # if not logged in send to login page with next page to go to after login
-        # how can i move all this into the model and not have to have a conditional
-        # in the view just one line and if not logged in go to another page and dont return
-        # to the calling function
-        next_pg = base64.urlsafe_b64encode(reverse(request.path))
+        next_pg = base64.urlsafe_b64encode(request.path)
         return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
-
 
 
 def create(request):
     """Creates the Object"""
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
     user = User.objects.logged_in(request.session)
     if user:
-        cat_data = {'name': 'Dog',
-                    'age': 7,
-                    'user': user}
-        cat = Cat.objects.create(**cat_data)
-        return HttpResponse(cat)
+        valid, data = Cat.objects.add_cat(request.POST, user)
+        logging.debug(data)
+        if valid:
+            return redirect(reverse('cats:index'))
+        else:
+            for i in data:
+                messages.add_message(request, messages.ERROR, i.message)
+            return redirect(reverse('cats:new')) 
+        # can we do this better
+        return redirect(reverse('cats:index'))
     else:
         # if not logged in send to login page with next page to go to after login
-        # how can i move all this into the model and not have to have a conditional
-        # in the view just one line and if not logged in go to another page and dont return
-        # to the calling function
         next_pg = base64.urlsafe_b64encode(reverse('cats:new'))
         return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
 
 
 def show(request, objId):
     """Shows a specific Object"""
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
-    return HttpResponse(logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path)))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
+    user = User.objects.logged_in(request.session)
+    if user:
+        context = {'user': user,
+                   'cat': Cat.objects.get(id=objId)}
+        return render(request, 'cats/show_cat.html', context)
+    else:
+        # if not logged in send to login page with next page to go to after login
+        next_pg = base64.urlsafe_b64encode(request.path)
+        return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
 
 
 def edit(request, objId):
     """Shows a specific Object for editing"""
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
-    return HttpResponse(logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path)))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
+    user = User.objects.logged_in(request.session)
+    cat = Cat.objects.get(id=objId)
+    context = {'user':user,
+                'cat':cat,}
+    return render(request,'cats/edit_cat.html', context)
+
 
 
 def update(request, objId):
     """Updates a specific Object"""
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
-    return HttpResponse(logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path)))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
+    user = User.objects.logged_in(request.session)
+    # need to move user owns cat validation to model
+    cat = Cat.objects.get(id = objId)
+    if user and cat.user == user:
+        # TODO add error handling
+        Cat.objects.update_cat(cat, request.POST)
+        return redirect(reverse('cats:index'))
+    else:
+        # if not logged in send to login page with next page to go to after login
+        next_pg = base64.urlsafe_b64encode(reverse('cats:edit', objId))
+        return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
 
 
 def destroy(request, objId):
     """Deletes a specific Object"""
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
-    return HttpResponse(logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path)))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
+    user = User.objects.logged_in(request.session)
+    cat = Cat.objects.get(id=objId)
+    # Make sure the user is a valid user and the user owns the cat
+    if user and cat.user == user:
+        # TODO add error handling
+        cat.delete()
+        return redirect(reverse('cats:index'))
+    else:
+        # if not logged in send to login page with next page to go to after login
+        next_pg = base64.urlsafe_b64encode(reverse('cats:index'))
+        return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
+
 
 
 def create_like(request, objId):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
+    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+                                      request.resolver_match.func.__name__, request.path))
     user = User.objects.logged_in(request.session)
     if user:
         cat = Cat.objects.get(id=objId)
         cat.likes.add(user)
-        return HttpResponse(cat)
+        return redirect(reverse('cats:index'))
     else:
         # if not logged in send to login page with next page to go to after login
-        # how can i move all this into the model and not have to have a conditional
-        # in the view just one line and if not logged in go to another page and dont return
-        # to the calling function
         next_pg = base64.urlsafe_b64encode(reverse('cats:new'))
         return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
-

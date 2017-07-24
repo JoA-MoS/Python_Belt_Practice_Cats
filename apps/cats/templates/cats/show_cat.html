@@ -1,0 +1,9 @@
+{% extends 'base.html' %} 
+{% block title %} {{cat.name}} details {% endblock title %} 
+{% block content %}
+<h2>{{cat.name}}!!</h2>
+<p>Name: {{cat.name}}</p>
+<p>Age: {{cat.age}}</p>
+<p>Likes: {{cat.likes.count}}</p>
+<!--<pre> {% filter force_escape %} {% debug %} {% endfilter %} </pre>-->
+{% endblock content %}
