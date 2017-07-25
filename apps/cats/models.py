@@ -63,7 +63,7 @@ class Cat(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='cats')
-    likes = models.ManyToManyField(User,related_name='users')
+    likes = models.ManyToManyField(User, related_name='users')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

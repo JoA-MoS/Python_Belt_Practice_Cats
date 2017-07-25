@@ -15,43 +15,32 @@ logging.basicConfig(level=logging.DEBUG,
 
 # Create your views here.
 
-@user_login_required(login_url=settings.LOGIN_URL)
+@user_login_required
 def index(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
-    """ This is a good sample of how to protect a view """
-    return redirect('users:disp_users')
+    return redirect(settings.HOME_URL)
   
 
-@user_login_required(login_url=settings.LOGIN_URL)
+@user_login_required
 def show_users_list(request):
-    """ This is a good sample of how to protect a view """
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
-
-    print 'disp users'
-    user = User.objects.logged_in(request.session)
-    if user:
-        # if User.objects.logged_in(request.session):
-        # if logged in do the stuff you need to do
-        context = {'user': user,
-                   'users': User.objects.all()}
-        return render(request, 'users/list.html', context)
-    else:
-        # if not logged in send to login page with next page to go to after login
-        next_pg = base64.urlsafe_b64encode(request.path)
-        return redirect(reverse('users:disp_login') + '?next={}'.format(next_pg))
+    user = User.objects.get_user(request.session['user_id'])
+    context = {'user': user,
+                'users': User.objects.all()}
+    return render(request, 'users/list.html', context)
 
 
 def show_register(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     return render(request, 'users/register.html')
 
 
 @require_http_methods(['POST'])
 def create(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     valid, data = User.objects.add(request.POST)
     if valid:
@@ -65,15 +54,15 @@ def create(request):
 
 
 def show_register_login(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     return render(request, 'users/combined.html')
 
 
 def show_login(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
-    context = {}
+    context =  {}
     if 'next' in request.GET:
         context['next_pg'] = request.GET['next']
     return render(request, 'users/login.html', context)
@@ -81,7 +70,7 @@ def show_login(request):
 
 @require_http_methods(['POST'])
 def login(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     """Validates user is email and password, sets session variables"""
     # flush the existing session if they were already logged in
@@ -104,9 +93,9 @@ def login(request):
         # TODO: looses next page if they type the password wrong
         return redirect('users:disp_login')
 
-
+@user_login_required
 def logout(request):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     request.session.flush()
     messages.add_message(request, messages.SUCCESS, 'You have been logged out')
@@ -114,7 +103,7 @@ def logout(request):
 
 
 def show(request, userId):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     user = User.objects.get(id=userId)
     reviews = user.reviews.all()
@@ -126,23 +115,23 @@ def show(request, userId):
     }
     return render(request, 'users/show_user.html', context)
 
-
+@user_login_required
 def edit(request, id):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     """Shows a specific Object for editing"""
     pass
 
-
+@user_login_required
 def update(request, id):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     """Updates a specific Object"""
     pass
 
-
+@user_login_required
 def destroy(request, id):
-    logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
+    logging.debug(' %s. %s -  %s' % (request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     """Deletes a specific Object"""
     pass

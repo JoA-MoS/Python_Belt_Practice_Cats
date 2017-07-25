@@ -1,15 +1,7 @@
 <form action="{% url 'users:create' %}" method="POST">
     {% csrf_token %}
     <h2>Registration</h2>
-    {% if messages %}
-    <div class="alert alert-danger">
-        <ul class="messages">
-            {% for msg in messages %}
-            <li>{{msg.message}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+{% include '_flash_msgs.html' %}
     <div class="form-group">
         <label for="first_name">First Name:</label>
         <input type="text" class="form-control" name="first_name" id="first_name" aria-describedby="first_name_help" placeholder="Enter your first name">

@@ -4,15 +4,7 @@
 <form action="{% url 'cats:create' %}" method="POST">
     {% csrf_token %}
     <h2>Add a cat</h2>
-    {% if messages %}
-    <div class="alert alert-danger">
-        <ul class="messages">
-            {% for msg in messages %}
-            <li>{{msg.message}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+{% include '_flash_msgs.html' %}
     <div>
         {% include "cats/_cat_fields.html" %}
     </div>

@@ -19,14 +19,9 @@ def user_passes_test(test_func, login_url=None, next_url=None):
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
-            print 'in decorator'
             if 'user_id' in request.session:
-                print 'user_id in session'
                 user = User.objects.get_user(request.session['user_id'])
-                print request.session['user_id']
-                print user
                 if user:
-                    print 'user exists'
                     if test_func(user):
                         return view_func(request, *args, **kwargs)
             b64_resolved_next_url = base64.urlsafe_b64encode(resolve_url(next_url or request.path))
@@ -49,4 +44,19 @@ def user_login_required(function=None, login_url=None, next_url=None):
     if function:
         return actual_decorator(function)
     return actual_decorator
+
+
+# def user_is_owner(function=None, login_url=None, next_url=None):
+#     """
+#     Decorator for views that checks that the user is logged in, redirecting
+#     to the log-in page if necessary.
+#     """
+#     actual_decorator = user_passes_test(
+#         lambda u: u.is_authenticated,
+#         login_url=login_url,
+#         next_url=next_url, 
+#     )
+#     if function:
+#         return actual_decorator(function)
+#     return actual_decorator
         

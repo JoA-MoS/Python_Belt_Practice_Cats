@@ -14,5 +14,5 @@ urlpatterns = [
     url(r'^(?P<objId>\d+)/update/$', views.update, name='update'),
     url(r'^(?P<objId>\d+)/destroy/$', views.destroy, name='destroy'),
     url(r'^(?P<objId>\d+)/like/$', views.create_like, name='create_like'),
-    url(r'^(?P<objId>\d+)/like/destroy$', views.create_like, name='destroy_like'),
+    url(r'^(?P<objId>\d+)/like/destroy$', views.destroy_like, name='destroy_like'),
 ]

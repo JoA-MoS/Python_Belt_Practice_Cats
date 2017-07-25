@@ -1,15 +1,7 @@
 <form action="{% url 'users:do_login' %}" method="POST">
     {% csrf_token %}
     <h2>Login</h2>
-    {% if messages %}
-    <div class="alert alert-danger">
-        <ul class="messages">
-            {% for msg in messages %}
-            <li>{{msg.message}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+{% include '_flash_msgs.html' %}
     <input type="hidden" name="next_pg" value="{{ next_pg }}" />
     <div class="form-group">
         <label for="email">Email:</label>
