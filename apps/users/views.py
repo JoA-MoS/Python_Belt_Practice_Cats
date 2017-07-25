@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from .models import User
+from .decorators import user_login_required
 import base64
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -14,18 +15,15 @@ logging.basicConfig(level=logging.DEBUG,
 
 # Create your views here.
 
-
+@user_login_required(login_url=settings.LOGIN_URL)
 def index(request):
     logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,
                                       request.resolver_match.func.__name__, request.path))
     """ This is a good sample of how to protect a view """
-    if User.objects.logged_in(request.session):
-        # if logged in do the stuff you need to do
-        return redirect('users:disp_users')
-    else:
-        return render(request, 'users/combined.html')
+    return redirect('users:disp_users')
+  
 
-
+@user_login_required(login_url=settings.LOGIN_URL)
 def show_users_list(request):
     """ This is a good sample of how to protect a view """
     logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces,

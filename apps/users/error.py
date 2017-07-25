@@ -8,4 +8,4 @@ class Error(object):
         self.created_at = timezone.now()
 
     def __str__(self):
-        return '{}\t{}\t{}'.format(self.created_at, self.field, self.message)
+        return '%s\t%s\t%s' % (self.created_at, self.field, self.message)

@@ -2,7 +2,7 @@
 {% block title %} Welcome {% endblock title %} 
 {% block content %}
 <h2>Welcom {{user.first_name}}!!</h2>
-<a href="{% url 'cats:new'%}">Add a cat!</a>
+{% comment %} <a href="{% url 'cats:new'%}">Add a cat!</a> {% endcomment %}
 
 <table class="table table-striped">
     <thead class="thead-inverse">
@@ -16,14 +16,18 @@
     <tbody>
         {% if cats %} {% for cat in cats %}
         <tr>
-            <td scope="row">{{cat.name}}</td>
+            <td scope="row"><a href="{% url 'cats:show' cat.id %}">{{cat.name}}</a></td>
             <td>{{cat.age}}</td>
             <td>{{cat.likes.count}}</td>
             <td>
-                {% if cat.user.id == user.id %}
+                {% if cat.user == user %}
                     <a href="{% url 'cats:destroy' cat.id %}">delete</a> | <a href="{% url 'cats:edit' cat.id %}">edit</a>
                 {% else %}
-                    <a href="{% url 'cats:create_like' cat.id %}">Add Like</a>
+                    {% if user in cat.likes.all %}
+                        <a href="{% url 'cats:destroy_like' cat.id %}">Remove Like</a>
+                    {% else %}
+                        <a href="{% url 'cats:create_like' cat.id %}">Add Like</a>
+                    {% endif %}
                 {% endif %}
                 </td>
         </tr>

@@ -11,7 +11,7 @@ import bcrypt
 
 
 class UserManager(models.Manager):
-    def validateRegistration(self, data):
+    def validate_registration(self, data):
         errors = []
         if 'first_name' in data and 'last_name' in data and 'email' in data and 'password' in data and 'c_password' in data:
             valid, msg = isvalid.first_name(data['first_name'])
@@ -44,7 +44,7 @@ class UserManager(models.Manager):
             return (True, data)
 
     def add(self, data):
-        valid, errors = self.validateRegistration(data)
+        valid, errors = self.validate_registration(data)
         if valid:
             hashedpwd = bcrypt.hashpw(data['password'].encode(), bcrypt.gensalt())
             return (valid, self.create(first_name=data['first_name'],
@@ -58,19 +58,25 @@ class UserManager(models.Manager):
         """Authenticate User"""
         pass
 
+    def get_user(self, user_id):
+        try:
+            return self.get(id=user_id)
+        except:
+            return None
+
     def logged_in(self, ses):
-        # logging.debug('{}.{} - {}'.format(request.resolver_match.namespaces, request.resolver_match.func.__name__, request.path))
         if 'user_id' in ses:
             try:
-                user = self.get(id=ses['user_id'])
+                user = self.get_user(ses['user_id'])
                 return user
             except:
-                return False
-        return False
+                return None
+        return None
 
     def validateLogin(self, data):
         errors = []
         users = {}
+        print 'in validate login'
         if 'email' in data and 'password' in data:
             valid, msg = isvalid.email(data['email'])
             if not valid:
@@ -78,7 +84,7 @@ class UserManager(models.Manager):
             # if the email looks good check if the user password matches
             if not errors:
                 users = self.filter(email=data['email'])
-                if len(users) != 1:
+                if len(users) > 1:
                     errors.append(Error('email, password', 'something went wrong please contact customer support'))
                 else:
                     if bcrypt.hashpw(data['password'].encode(), users[0].password.encode()) != users[0].password:
@@ -110,3 +116,9 @@ class User(models.Model):
     @property
     def full_name(self):
         return '{} {}'.format(self.first_name, self.last_name)
+
+    @property
+    def is_authenticated(self):
+        #if we have a user object to access this property then 
+        #they are authenticated it should always be true
+        return True

@@ -44,7 +44,7 @@ class CatManager(models.Manager):
             return (valid, errors)
 
     def update_cat(self, cat, data):
-        logging.debug('add cat')
+        logging.debug('update cat')
         valid, errors = self.validate_cat(data)
         logging.debug(errors)
         if valid:
@@ -54,6 +54,9 @@ class CatManager(models.Manager):
             return (valid, cat)
         else:
             return (valid, errors)
+
+
+
 
 class Cat(models.Model):
     objects = CatManager()
@@ -65,10 +68,10 @@ class Cat(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return '{}: {} {} {} {}'.format(self.id, self.name, self.age, self.user, self.likes.count())
+        return '%s: %s %s %s %s' % (self.id, self.name, self.age, self.user, self.likes.count())
 
     def __unicode__(self):
-        return '{}: {} {} {} {}'.format(self.id, self.name, self.age, self.user, self.likes.count())
+        return '%s: %s %s %s %s' % (self.id, self.name, self.age, self.user, self.likes.count())
 
 
 # TODO: Create a seperate app to track likes it seems like a common ask

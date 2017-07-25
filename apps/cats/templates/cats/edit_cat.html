@@ -3,7 +3,16 @@
 {% block content %}
 <form action="{% url 'cats:update' cat.id %}" method="POST">
     {% csrf_token %}
-    <h2>Edit a cat</h2>
+    <h2>Edit {{cat.name}}</h2>
+     {% if messages %}
+    <div class="alert alert-danger">
+        <ul class="messages">
+            {% for msg in messages %}
+            <li>{{msg.message}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     <div>
         {% include "cats/_cat_fields.html" %}
     </div>
