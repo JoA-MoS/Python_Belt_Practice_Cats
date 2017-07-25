@@ -26,7 +26,7 @@ SECRET_KEY = '&cc(v31zyodno&0zfq=1d@+@4al9$pnxybx!dc*z@11htb3*r4'
 DEBUG = True
 
 ALLOWED_HOSTS = ['python-cats.xxmnmkjscj.us-west-1.elasticbeanstalk.com',
-                '127.0.0.1:8000',]
+                '127.0.0.1',]
 
 
 # Application definition
